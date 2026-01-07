@@ -8,3 +8,9 @@
 
 ## Class Balancing
 - Applied compute_class_weight('balanced') to counteract emotion sample imbalance.
+
+## Model 1: Simple RNN
+- Embedding(10000, 128, input_length=50)
+- SimpleRNN(128, return_sequences=True) + Dropout(0.5)
+- SimpleRNN(64) + Dropout(0.5)
+- Dense(6, softmax)
