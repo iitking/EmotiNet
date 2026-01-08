@@ -14,3 +14,5 @@
 - SimpleRNN(128, return_sequences=True) + Dropout(0.5)
 - SimpleRNN(64) + Dropout(0.5)
 - Dense(6, softmax)
+- Simple RNN Test Loss: 0.689, Test Accuracy: 76.1%
+- Observation: Slower gradient propagation, struggles with long dependencies.
