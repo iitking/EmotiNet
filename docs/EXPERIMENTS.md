@@ -16,3 +16,9 @@
 - Dense(6, softmax)
 - Simple RNN Test Loss: 0.689, Test Accuracy: 76.1%
 - Observation: Slower gradient propagation, struggles with long dependencies.
+
+## Model 2: LSTM
+- Embedding(10000, 128, input_length=50)
+- LSTM(128, return_sequences=True) + Dropout(0.5)
+- LSTM(64) + Dropout(0.5)
+- Dense(6, softmax)
