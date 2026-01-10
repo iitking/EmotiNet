@@ -22,3 +22,5 @@
 - LSTM(128, return_sequences=True) + Dropout(0.5)
 - LSTM(64) + Dropout(0.5)
 - Dense(6, softmax)
+- LSTM Test Loss: 0.448, Test Accuracy: 84.2%
+- Observation: Significant improvement over RNN due to memory cells.
