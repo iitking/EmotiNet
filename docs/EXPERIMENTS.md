@@ -30,3 +30,5 @@
 - GRU(128, return_sequences=True) + Dropout(0.5)
 - GRU(64) + Dropout(0.5)
 - Dense(6, softmax)
+- GRU Test Loss: 0.412, Test Accuracy: 85.4%
+- Observation: Faster epoch training time than LSTM with fewer parameters.
