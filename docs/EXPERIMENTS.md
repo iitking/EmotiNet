@@ -32,3 +32,6 @@
 - Dense(6, softmax)
 - GRU Test Loss: 0.412, Test Accuracy: 85.4%
 - Observation: Faster epoch training time than LSTM with fewer parameters.
+
+## Model 4: Bidirectional GRU (BiGRU)
+- Hypothesis: Bidirectional context captures sentiment cues placed at sentence end.
