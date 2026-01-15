@@ -35,3 +35,6 @@
 
 ## Model 4: Bidirectional GRU (BiGRU)
 - Hypothesis: Bidirectional context captures sentiment cues placed at sentence end.
+- Upgraded embedding dimension from 128 to 300.
+- Bidirectional(GRU(128, return_sequences=True)) + Dropout(0.5)
+- Bidirectional(GRU(64)) + Dropout(0.5)
