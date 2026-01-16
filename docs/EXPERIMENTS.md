@@ -38,3 +38,5 @@
 - Upgraded embedding dimension from 128 to 300.
 - Bidirectional(GRU(128, return_sequences=True)) + Dropout(0.5)
 - Bidirectional(GRU(64)) + Dropout(0.5)
+- Added EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+- Optimizer: Adam (lr=0.001)
