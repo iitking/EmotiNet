@@ -40,3 +40,8 @@
 - Bidirectional(GRU(64)) + Dropout(0.5)
 - Added EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 - Optimizer: Adam (lr=0.001)
+
+### BiGRU Results (WINNER):
+- BiGRU Test Loss: 0.334
+- BiGRU Test Accuracy: 88.7%
+- Best performing model across all metrics!
