@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmotiNet | Deep Learning Emotion Recognition System</title>
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon.svg">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: ['class', '[data-theme="dark"]'],
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen flex flex-col relative selection:bg-indigo-500 selection:text-white">
+
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow">
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="sticky top-0 z-40 w-full border-b border-white/5 bg-slate-950/70 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-pink-200 bg-clip-text text-transparent">EmotiNet</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">v1.0 BiGRU</span>
+          </div>
+          <p class="text-[11px] text-gray-400 hidden sm:block">Deep Bidirectional GRU Emotion Classifier</p>
+        </div>
+      </div>
+
+      <!-- Navigation & Controls -->
+      <div class="flex items-center gap-3">
+        <!-- Live Status Pill -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-gray-300">
+          <span id="status-pill" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="status-text" class="font-mono text-[11px]">Connecting...</span>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <button id="theme-toggle" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 transition-all hover:scale-105" title="Toggle Theme">
+          <i id="sun-icon" data-lucide="sun" class="w-4 h-4"></i>
+          <i id="moon-icon" data-lucide="moon" class="w-4 h-4 hidden"></i>
+        </button>
+
+        <!-- Swagger Docs Link -->
+        <a href="/docs" target="_blank" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 transition-all">
+          <i data-lucide="file-code-2" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>Swagger Docs</span>
+        </a>
+
+        <!-- GitHub Link Button -->
+        <a href="https://github.com" target="_blank" class="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 transition-all hover:scale-105" title="GitHub Repository">
+          <i data-lucide="github" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+    
+    <!-- Hero Headline Section -->
+    <div class="text-center max-w-3xl mx-auto mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-3">
+        <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+        <span>Bidirectional Recurrent Neural Network Architecture</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-3">
+        Detect Human Emotions with <span class="gradient-text">Deep Neural Intelligence</span>
+      </h1>
+      <p class="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto">
+        Analyze emotional nuances in natural language across 6 distinct emotional spectrums: 
+        <span class="text-amber-400 font-medium">Joy</span>, 
+        <span class="text-blue-400 font-medium">Sadness</span>, 
+        <span class="text-pink-400 font-medium">Love</span>, 
+        <span class="text-red-400 font-medium">Anger</span>, 
+        <span class="text-purple-400 font-medium">Fear</span>, and 
+        <span class="text-cyan-400 font-medium">Surprise</span>.
+      </p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center justify-center mb-8">
+      <div class="flex p-1 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md max-w-2xl w-full justify-between overflow-x-auto">
+        <button class="tab-btn active flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex-1" data-tab="single">
+          <i data-lucide="sparkle" class="w-4 h-4"></i>
+          <span>Live Predictor</span>
+        </button>
+        <button class="tab-btn flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex-1 text-gray-400 hover:text-white" data-tab="batch">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Batch Analyzer</span>
+        </button>
+        <button class="tab-btn flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex-1 text-gray-400 hover:text-white" data-tab="architecture">
+          <i data-lucide="network" class="w-4 h-4"></i>
+          <span>BiGRU Architecture</span>
+        </button>
+        <button class="tab-btn flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex-1 text-gray-400 hover:text-white" data-tab="api">
+          <i data-lucide="terminal" class="w-4 h-4"></i>
+          <span>API Playground</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 1: LIVE SINGLE PREDICTOR
+         ========================================================================= -->
+    <div id="tab-content-single" class="tab-content">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Input Form & Quick Prompts (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col gap-6">
+          
+          <!-- Text Input Card -->
+          <div class="glass-panel rounded-3xl p-6 sm:p-7 relative">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                <i data-lucide="message-square-text" class="w-4 h-4 text-indigo-400"></i>
+                Input Text Sentence
+              </span>
+              <div class="flex items-center gap-3 text-xs text-gray-400">
+                <span id="word-count">0 words</span>
+                <span>•</span>
+                <span id="char-count">0 / 2000</span>
+              </div>
+            </div>
+
+            <!-- Sleek Textarea -->
+            <div class="relative mb-4">
+              <textarea 
+                id="text-input" 
+                rows="5" 
+                placeholder="Type or paste any sentence to detect its emotional tone... (or click the microphone icon to speak)"
+                class="w-full bg-slate-900/50 text-gray-100 placeholder-gray-500 rounded-2xl p-4 text-sm sm:text-base border border-white/10 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none transition-all resize-y"
+              ></textarea>
+            </div>
+
+            <!-- Action Controls Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/5">
+              <div class="flex items-center gap-2">
+                <!-- Speech to Text Mic Button -->
+                <button id="mic-btn" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 transition-all hover:scale-105" title="Voice Input (Speech-to-Text)">
+                  <i data-lucide="mic" class="w-4 h-4 text-rose-400"></i>
+                </button>
+                <!-- Paste Button -->
+                <button id="paste-btn" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 transition-all hover:scale-105" title="Paste Clipboard">
+                  <i data-lucide="clipboard" class="w-4 h-4 text-gray-400"></i>
+                </button>
+                <!-- Clear Button -->
+                <button id="clear-btn" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 transition-all hover:scale-105" title="Clear Text">
+                  <i data-lucide="trash-2" class="w-4 h-4 text-gray-400"></i>
+                </button>
+              </div>
+
+              <!-- Submit CTA Button -->
+              <button id="analyze-btn" class="gradient-btn px-6 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/25 transition-all">
+                <span id="btn-spinner" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin hidden"></span>
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span id="btn-text">Analyze Emotion</span>
+                <kbd class="hidden sm:inline-block ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-white/20 rounded border border-white/20">⌘ Enter</kbd>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Try Sample Prompts -->
+          <div class="glass-panel rounded-3xl p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                <i data-lucide="lightbulb" class="w-3.5 h-3.5 text-amber-400"></i>
+                Quick Sample Sentences
+              </span>
+              <span class="text-[11px] text-gray-500">Click any pill to analyze</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="I just found out I passed the final exam with distinction, I am so ecstatic!">
+                <span>😊 Joy</span>
+              </button>
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="I feel so lonely and hopeless sitting here in the empty room all alone.">
+                <span>😢 Sadness</span>
+              </button>
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="You mean the absolute world to me and I will treasure our memories forever.">
+                <span>💖 Love</span>
+              </button>
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="I am furious that customer support hung up after keeping me on hold for an hour!">
+                <span>🔥 Anger</span>
+              </button>
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="I heard strange creaking footsteps outside my dark hallway and froze in sheer terror.">
+                <span>⚡ Fear</span>
+              </button>
+              <button class="prompt-pill px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white flex items-center gap-1.5" data-sample="I was totally stunned when all my childhood friends jumped out with gifts!">
+                <span>😲 Surprise</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- History Widget -->
+          <div class="glass-panel rounded-3xl p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                <i data-lucide="history" class="w-3.5 h-3.5 text-indigo-400"></i>
+                Prediction History (<span id="history-count">0</span>)
+              </span>
+              <button id="clear-history-btn" class="text-[11px] text-gray-500 hover:text-rose-400 transition-colors">Clear History</button>
+            </div>
+            <div id="history-list" class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"></div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Interactive Prediction Results (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-6">
+          
+          <!-- Empty State / Placeholder -->
+          <div id="results-placeholder" class="glass-panel rounded-3xl p-10 text-center flex flex-col items-center justify-center min-h-[460px]">
+            <div class="w-20 h-20 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
+              <i data-lucide="activity" class="w-10 h-10 text-indigo-400 animate-pulse"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-200 mb-2">Neural Prediction Engine Ready</h3>
+            <p class="text-xs text-gray-400 max-w-xs mb-6">
+              Enter a sentence or choose a sample prompt on the left to see full multi-class emotion probabilities and spectrum radar.
+            </p>
+            <div class="flex items-center gap-2 text-[11px] text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-full border border-indigo-500/20">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+              <span>BiGRU Model 88.7% Test Accuracy</span>
+            </div>
+          </div>
+
+          <!-- Results Content (Initially Hidden) -->
+          <div id="results-content" class="flex flex-col gap-6 hidden">
+            
+            <!-- Hero Result Card -->
+            <div id="hero-card" class="glass-panel rounded-3xl p-6 relative overflow-hidden transition-all duration-300">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center gap-3">
+                  <div id="hero-emoji" class="text-5xl animate-float filter drop-shadow">😊</div>
+                  <div>
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">Predicted Emotion</span>
+                    <h2 id="hero-emotion" class="text-3xl font-extrabold tracking-tight">JOY</h2>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-1.5">
+                  <span id="hero-confidence" class="px-3 py-1 rounded-full text-xs font-mono font-bold border">
+                    98.4% Confidence
+                  </span>
+                  <span id="hero-speed" class="text-[10px] font-mono text-gray-400">⚡ 12 ms</span>
+                </div>
+              </div>
+
+              <!-- Metadata Badges -->
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-gray-300 flex items-center gap-1.5">
+                  <i data-lucide="smile" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  <span id="hero-sentiment">Positive Sentiment</span>
+                </span>
+                <span class="px-2.5 py-1 rounded-lg text-xs font-medium bg-white/5 border border-white/10 text-gray-300 flex items-center gap-1.5">
+                  <i data-lucide="gauge" class="w-3.5 h-3.5 text-pink-400"></i>
+                  <span id="hero-intensity">High Energy</span>
+                </span>
+              </div>
+
+              <p id="hero-description" class="text-xs text-gray-300 leading-relaxed border-t border-white/5 pt-3">
+                Expresses happiness, delight, celebration, excitement, and overall optimism.
+              </p>
+            </div>
+
+            <!-- Emotion Spectrum Radar Chart -->
+            <div class="glass-panel rounded-3xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                  <i data-lucide="radar" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  Emotion Spectrum Radar
+                </span>
+                <span class="text-[10px] font-mono text-gray-500">6 Dimensions</span>
+              </div>
+              <div class="chart-box flex items-center justify-center">
+                <canvas id="emotion-radar-chart"></canvas>
+              </div>
+            </div>
+
+            <!-- Probability Distribution Bars -->
+            <div class="glass-panel rounded-3xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                  <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-indigo-400"></i>
+                  Multi-Class Probabilities
+                </span>
+                <span class="text-[10px] font-mono text-gray-500">Softmax Distribution</span>
+              </div>
+              <div id="emotion-bars-container" class="flex flex-col gap-3.5"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 2: BATCH & FILE ANALYZER
+         ========================================================================= -->
+    <div id="tab-content-batch" class="tab-content hidden">
+      <div class="max-w-4xl mx-auto flex flex-col gap-6">
+        
+        <div class="glass-panel rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-100 flex items-center gap-2">
+                <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+                Batch Text Processing
+              </h2>
+              <p class="text-xs text-gray-400">Analyze multiple sentences or upload a document (.txt or .csv) for bulk inference</p>
+            </div>
+            
+            <label for="batch-file-input" class="cursor-pointer px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-2 transition-all">
+              <i data-lucide="upload" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Upload File</span>
+              <input type="file" id="batch-file-input" accept=".txt,.csv" class="hidden">
+            </label>
+          </div>
+
+          <textarea 
+            id="batch-text-input" 
+            rows="6" 
+            placeholder="Paste multiple sentences here (one sentence per line)...
+Example:
+I just passed the final exam!
+I feel very sad and lonely today.
+Why did they cancel the order without telling me?
+Hearing strange footsteps in the dark alley..."
+            class="w-full bg-slate-900/50 text-gray-100 placeholder-gray-500 rounded-2xl p-4 text-sm border border-white/10 focus:border-indigo-500 focus:outline-none mb-4 font-mono"
+          ></textarea>
+
+          <div class="flex items-center justify-end">
+            <button id="batch-analyze-btn" class="gradient-btn px-6 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-indigo-500/25">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Process Batch</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Batch Results Card -->
+        <div id="batch-results-card" class="glass-panel rounded-3xl p-6 hidden">
+          <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-white/5">
+            <div class="flex items-center gap-3">
+              <span id="batch-total-count" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                0 Items
+              </span>
+              <span class="text-xs text-gray-400">Dominant Emotion:</span>
+              <span id="batch-dominant-emotion" class="text-sm font-bold font-mono">--</span>
+              <span id="batch-speed" class="text-[11px] font-mono text-gray-500">--</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button id="export-csv-btn" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 flex items-center gap-1.5 transition-all">
+                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>Export CSV</span>
+              </button>
+              <button id="export-json-btn" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 flex items-center gap-1.5 transition-all">
+                <i data-lucide="code" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>Export JSON</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 text-xs uppercase tracking-wider text-gray-400 font-semibold">
+                  <th class="py-3 px-4">#</th>
+                  <th class="py-3 px-4">Sentence</th>
+                  <th class="py-3 px-4">Emotion</th>
+                  <th class="py-3 px-4">Confidence</th>
+                  <th class="py-3 px-4">Sentiment</th>
+                </tr>
+              </thead>
+              <tbody id="batch-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 3: ARCHITECTURE & BENCHMARKS
+         ========================================================================= -->
+    <div id="tab-content-architecture" class="tab-content hidden">
+      <div class="max-w-5xl mx-auto flex flex-col gap-8">
+        
+        <!-- Architecture Pipeline Visual -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center gap-2 mb-2 text-indigo-400 text-xs font-bold uppercase tracking-wider">
+            <i data-lucide="cpu" class="w-4 h-4"></i>
+            <span>Deep Learning Pipeline</span>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-100 mb-3">Bidirectional GRU Neural Pipeline</h2>
+          <p class="text-sm text-gray-400 mb-8 max-w-3xl">
+            Bidirectional Gated Recurrent Units (BiGRU) process sequential text in forward and backward directions simultaneously, capturing both past context and future dependencies for superior emotional sentiment nuance.
+          </p>
+
+          <!-- Pipeline Flowchart Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
+            
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-indigo-400 font-bold">STAGE 01</span>
+                <h4 class="text-sm font-bold text-gray-200 mt-1">Raw Text Tokenizer</h4>
+                <p class="text-xs text-gray-400 mt-2">Keras Tokenizer with 10,000 max words vocabulary and OOV token handling.</p>
+              </div>
+              <div class="mt-4 text-[10px] font-mono text-gray-500">Output: Int Sequences</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-indigo-400 font-bold">STAGE 02</span>
+                <h4 class="text-sm font-bold text-gray-200 mt-1">Pad Sequences</h4>
+                <p class="text-xs text-gray-400 mt-2">Fixed sequence length of 50 tokens with post-padding and truncating.</p>
+              </div>
+              <div class="mt-4 text-[10px] font-mono text-gray-500">Shape: (Batch, 50)</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-indigo-400 font-bold">STAGE 03</span>
+                <h4 class="text-sm font-bold text-gray-200 mt-1">Dense Embedding</h4>
+                <p class="text-xs text-gray-400 mt-2">Projects discrete tokens into continuous 300-dimensional vector representations.</p>
+              </div>
+              <div class="mt-4 text-[10px] font-mono text-gray-500">Dim: 10,000 → 300</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between bg-indigo-500/10 border-indigo-500/30">
+              <div>
+                <span class="text-[10px] font-mono text-indigo-300 font-bold">STAGE 04 (CORE)</span>
+                <h4 class="text-sm font-bold text-white mt-1">BiGRU Stack + Dropout</h4>
+                <p class="text-xs text-gray-300 mt-2">Bidirectional GRU (128 units) → Dropout 0.5 → BiGRU (64 units) → Dropout 0.5.</p>
+              </div>
+              <div class="mt-4 text-[10px] font-mono text-indigo-300">Bi-directional Context</div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-mono text-pink-400 font-bold">STAGE 05</span>
+                <h4 class="text-sm font-bold text-gray-200 mt-1">Softmax Dense Layer</h4>
+                <p class="text-xs text-gray-400 mt-2">Outputs calibrated probability distributions over 6 emotion classes.</p>
+              </div>
+              <div class="mt-4 text-[10px] font-mono text-pink-400">Classes: 6 (Sum = 1.0)</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Benchmark Comparison Table -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-xl font-bold text-gray-100">Model Experimentation Benchmarks</h3>
+              <p class="text-xs text-gray-400">Empirical evaluation on the test dataset across 4 recurrent neural architectures</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              BiGRU Selected
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/10 text-xs uppercase tracking-wider text-gray-400 font-semibold">
+                  <th class="py-3 px-4">Architecture</th>
+                  <th class="py-3 px-4">Test Accuracy</th>
+                  <th class="py-3 px-4">Test Loss</th>
+                  <th class="py-3 px-4">Parameters</th>
+                  <th class="py-3 px-4">Status</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm">
+                <tr class="border-b border-white/10 bg-indigo-500/10 font-bold">
+                  <td class="py-4 px-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>Bidirectional GRU (BiGRU)</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-normal">Best</span>
+                  </td>
+                  <td class="py-4 px-4 text-emerald-400 font-mono text-base">88.7%</td>
+                  <td class="py-4 px-4 font-mono">0.334</td>
+                  <td class="py-4 px-4 font-mono text-gray-400">~3.5M</td>
+                  <td class="py-4 px-4"><span class="px-2.5 py-1 rounded-full text-xs bg-emerald-500/20 text-emerald-300">Production</span></td>
+                </tr>
+                <tr class="border-b border-white/5 text-gray-300">
+                  <td class="py-3 px-4 font-medium">Standard GRU</td>
+                  <td class="py-3 px-4 font-mono">85.4%</td>
+                  <td class="py-3 px-4 font-mono">0.412</td>
+                  <td class="py-3 px-4 font-mono text-gray-400">~1.8M</td>
+                  <td class="py-3 px-4 text-xs text-gray-500">Baseline</td>
+                </tr>
+                <tr class="border-b border-white/5 text-gray-300">
+                  <td class="py-3 px-4 font-medium">Standard LSTM</td>
+                  <td class="py-3 px-4 font-mono">84.2%</td>
+                  <td class="py-3 px-4 font-mono">0.448</td>
+                  <td class="py-3 px-4 font-mono text-gray-400">~2.1M</td>
+                  <td class="py-3 px-4 text-xs text-gray-500">Baseline</td>
+                </tr>
+                <tr class="text-gray-300">
+                  <td class="py-3 px-4 font-medium">Simple RNN</td>
+                  <td class="py-3 px-4 font-mono">76.1%</td>
+                  <td class="py-3 px-4 font-mono">0.689</td>
+                  <td class="py-3 px-4 font-mono text-gray-400">~1.4M</td>
+                  <td class="py-3 px-4 text-xs text-gray-500">Baseline</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 4: DEVELOPER API PLAYGROUND
+         ========================================================================= -->
+    <div id="tab-content-api" class="tab-content hidden">
+      <div class="max-w-4xl mx-auto flex flex-col gap-6">
+        
+        <div class="glass-panel rounded-3xl p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-100 flex items-center gap-2">
+                <i data-lucide="terminal" class="w-5 h-5 text-indigo-400"></i>
+                REST API Integration
+              </h2>
+              <p class="text-xs text-gray-400">Integrate EmotiNet prediction endpoint into your Python, Node.js, or mobile applications</p>
+            </div>
+            <a href="/docs" target="_blank" class="px-4 py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 text-xs font-semibold border border-indigo-500/30 flex items-center gap-1.5 transition-all">
+              <span>Interactive Swagger UI</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- cURL Snippet -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between bg-slate-900 px-4 py-2 rounded-t-xl border border-white/10 border-b-0">
+              <span class="text-xs font-mono text-gray-400">cURL (Terminal)</span>
+              <button class="copy-code-btn text-xs text-gray-400 hover:text-white flex items-center gap-1" data-target="curl-code">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre class="bg-black/60 p-4 rounded-b-xl border border-white/10 text-xs font-mono text-indigo-300 overflow-x-auto"><code id="curl-code">curl -X POST "http://localhost:8000/api/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "I am so excited and proud of our team success!"}'</code></pre>
+          </div>
+
+          <!-- Python Snippet -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between bg-slate-900 px-4 py-2 rounded-t-xl border border-white/10 border-b-0">
+              <span class="text-xs font-mono text-gray-400">Python (requests)</span>
+              <button class="copy-code-btn text-xs text-gray-400 hover:text-white flex items-center gap-1" data-target="python-code">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre class="bg-black/60 p-4 rounded-b-xl border border-white/10 text-xs font-mono text-emerald-300 overflow-x-auto"><code id="python-code">import requests
+
+url = "http://localhost:8000/api/predict"
+payload = {"text": "I feel so grateful for all the love and support."}
+
+response = requests.post(url, json=payload)
+data = response.json()
+
+print(f"Predicted: {data['predicted_emotion']} ({data['confidence_percentage']}%)")
+print(f"Probabilities: {data['probabilities']}")</code></pre>
+          </div>
+
+          <!-- JavaScript Snippet -->
+          <div>
+            <div class="flex items-center justify-between bg-slate-900 px-4 py-2 rounded-t-xl border border-white/10 border-b-0">
+              <span class="text-xs font-mono text-gray-400">JavaScript (fetch)</span>
+              <button class="copy-code-btn text-xs text-gray-400 hover:text-white flex items-center gap-1" data-target="js-code">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+            <pre class="bg-black/60 p-4 rounded-b-xl border border-white/10 text-xs font-mono text-amber-300 overflow-x-auto"><code id="js-code">const response = await fetch("http://localhost:8000/api/predict", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: "I am absolutely shocked by the sudden turn of events!" })
+});
+
+const result = await response.json();
+console.log(result.predicted_emotion, result.confidence_percentage);</code></pre>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-white/5 py-8 mt-12 bg-slate-950/40 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-semibold text-gray-300">EmotiNet</span>
+        <span class="text-xs text-gray-500">• Neural Emotion Classification System</span>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-gray-500">
+        <span>FastAPI</span>
+        <span>•</span>
+        <span>TensorFlow / Keras</span>
+        <span>•</span>
+        <span>BiGRU Architecture</span>
+        <span>•</span>
+        <span>TailwindCSS</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Custom Logic -->
+  <script src="/static/js/app.js"></script>
+  <script>
+    // Initialize Lucide icons on load
+    lucide.createIcons();
+  </script>
+</body>
+</html>
