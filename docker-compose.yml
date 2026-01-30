@@ -1,0 +1,14 @@
+services:
+  emotinet:
+    build: .
+    container_name: emotinet_app
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+    restart: unless-stopped
+    volumes:
+      - ./BiGRU_Modle.keras:/app/BiGRU_Modle.keras:ro
+      - ./tokenizer.pkl:/app/tokenizer.pkl:ro
