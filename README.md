@@ -417,19 +417,37 @@ To inspect or retrain the neural model:
 
 ---
 
-## 👤 Author & Maintainer
+---
 
-**Nivesh Kumar Meena**
-- **GitHub**: [@iitking](https://github.com/iitking)
-- **Email**: [niveshkr149@gmail.com](mailto:niveshkr149@gmail.com)
-- **Project Repository**: [https://github.com/iitking/EmotiNet](https://github.com/iitking/EmotiNet)
+## 👨‍💻 Author
+
+<div align="center">
+
+<a href="https://github.com/iitking">
+  <img src="https://github.com/iitking.png" width="110" height="110" style="border-radius:50%" alt="Nivesh Kumar Meena" />
+</a>
+
+### **Nivesh Kumar Meena**
+
+**AI Architect · MLOps Engineer** | B.Tech Electrical Engineering, **IIT Roorkee**
+
+*Building agentic AI systems, RAG pipelines and production-ready ML.*
+
+<a href="https://www.linkedin.com/in/nivesh-kumar-meena-a31465221/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" /></a>
+<a href="https://github.com/iitking"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" /></a>
+<a href="mailto:niveshkr149@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
+
+<br/><br/>
+
+⭐ **If you found this project useful, please give it a star!** ⭐
+
+<sub>Open to AI/ML engineering opportunities and collaborations.</sub>
+
+</div>
 
 ---
 
-## 📜 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details. Free to use, adapt, and build upon for research, educational, and commercial purposes.
-
 <div align="center">
-  <sub>Built with ❤️ by Nivesh Kumar Meena • Powered by Deep Learning & FastAPI</sub>
+  <sub>Made with ❤️ by <a href="https://github.com/iitking">Nivesh Kumar Meena</a> · © 2026 · MIT License</sub>
 </div>
+
