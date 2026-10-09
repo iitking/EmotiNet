@@ -417,7 +417,6 @@ To inspect or retrain the neural model:
 
 ---
 
----
 
 ## 👨‍💻 Author
 
